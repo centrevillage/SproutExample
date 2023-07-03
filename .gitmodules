@@ -1,0 +1,6 @@
+[submodule "firmware/igb_sdk"]
+	path = firmware/igb_sdk
+	url = git@github.com:centrevillage/igb_sdk.git
+[submodule "firmware/libDaisy"]
+	path = firmware/libDaisy
+	url = git@github.com:electro-smith/libDaisy.git
