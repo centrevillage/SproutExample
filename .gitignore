@@ -30,3 +30,16 @@
 *.exe
 *.out
 *.app
+
+firmware/build/*
+!firmware/build/.keep
+
+*.eep
+*.lss
+*.map
+*.sym
+*.d
+*.lst
+*.swp
+*.swo
+*.envrc
