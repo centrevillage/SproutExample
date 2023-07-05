@@ -51,6 +51,8 @@ struct FxModelDelay {
         delay[i].init(getFloatPtr(area[i]), area[i].size);
       }
     }
+    updateBeatLfo();
+    initSync();
   }
 
   IGB_FAST_INLINE void deinit() {
@@ -59,9 +61,11 @@ struct FxModelDelay {
         memory_manager.releaseArea(area[i]);
       }
     }
+    beat_lfo.active = false;
   }
 
   void updateBeatLfo() {
+    beat_lfo.active = true;
     double rp = std::clamp(read_pos_normalize + read_pos_mod_normalize, 0.00001, 0.99999);
     beat_lfo.setTempo(1.0f / (rp * 10.0f));
   }

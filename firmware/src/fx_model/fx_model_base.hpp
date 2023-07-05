@@ -32,7 +32,7 @@ constexpr static float rate2freq(float rate) {
 }
 
 constexpr static float rate2q(float rate) {
-  return std::lerp(1.0f, igb::numbers::sqrt2, rate);
+  return std::lerp(1.0f, std::pow(igb::numbers::sqrt2, 8.0f), rate);
 }
 
 constexpr static float rate2gain(float rate) {

@@ -32,9 +32,13 @@ struct FxModelFilter {
   igb::dsp::BiQuadFilter::Context lpf_ctx[2];
   igb::dsp::BiQuadFilter::Context hpf_ctx[2];
 
-  IGB_FAST_INLINE void init() {
+  IGB_FAST_INLINE void updateFilter() {
     lpf.lpf(cutoff_freq, q);
     hpf.hpf(cutoff_freq, q);
+  }
+
+  IGB_FAST_INLINE void init() {
+    updateFilter();
   }
 
   IGB_FAST_INLINE void deinit() {
@@ -53,11 +57,13 @@ struct FxModelFilter {
       case AppParamId::sun:
         { // cutoff frequency
           cutoff_freq = rate2freq(v);
+          updateFilter();
         }
         break;
       case AppParamId::wet:
         { // resonancde
           q = rate2q(v);
+          updateFilter();
         }
         break;
       case AppParamId::time2: // wind + time

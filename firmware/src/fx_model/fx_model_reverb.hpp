@@ -34,9 +34,10 @@ struct FxModelReverb {
   igb::dsp::DelayLine main_line[reverb_order];
   MemoryArea main_area[reverb_order];
 
-  constexpr static float delay_min = 0.1f;
-  constexpr static float delay_max = 1.0f;
-  float delay = 0.5f;
+  constexpr static double delay_min = 0.1;
+  constexpr static double delay_max = 1.0;
+  double delay = 0.5f;
+  double delay_smooth = 0.5;
   float feedback = 0.5f;
   float wet_balance = 0.5f;
 
@@ -48,6 +49,7 @@ struct FxModelReverb {
         main_line[i].init(getFloatPtr(main_area[i]), main_area[i].size);
       }
     }
+    delay_smooth = delay;
   }
 
   IGB_FAST_INLINE void deinit() {
@@ -62,7 +64,7 @@ struct FxModelReverb {
     float v = (float)param_value / 1023.0f;
     switch(param_id) {
       case AppParamId::time:
-        delay = std::lerp(delay_min, delay_max, v);
+        delay = std::lerp(delay_min, delay_max, (double)v);
         break;
       case AppParamId::sun:
         feedback = 1.0f - ((1.0f - v) * (1.0f - v));
@@ -78,6 +80,8 @@ struct FxModelReverb {
 
   IGB_FAST_INLINE void process(const float* in_buf, float* out_buf, size_t count) {
     for (size_t x = 0; x < count; x += 2) {
+      delay_smooth = std::lerp(delay, delay_smooth, 0.99995);
+
       float l = *(in_buf++);
       float r = *(in_buf++);
 
@@ -89,7 +93,7 @@ struct FxModelReverb {
         float v = (i & 1) ? r : l;
         v /= igb::numbers::sqrt2;
         bus_v[i] = v;
-        wet_v[i] = main_line[i].readF((double)main_buffer_size * feedback_taps[i] * delay);
+        wet_v[i] = main_line[i].readF((double)main_buffer_size * feedback_taps[i] * delay_smooth);
         bus_v[i] += wet_v[i] * feedback;
       }
 

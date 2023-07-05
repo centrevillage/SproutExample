@@ -10,6 +10,7 @@
 #include <cmath>
 
 struct BeatLFO {
+  bool active = false;
   float phase = 0.0f;
   float delta = 0.0f;
   uint32_t usec = 0;
@@ -42,7 +43,7 @@ struct BeatLFO {
   }
 
   IGB_FAST_INLINE float getSig() const {
-    return sig;
+    return active ? sig : 0.0f;;
   }
 };
 
