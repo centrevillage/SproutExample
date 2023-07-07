@@ -80,6 +80,8 @@ Move the current directory to the `firmware/src/fx_model`.
 cd (Your Project Dir)/DaisyExample/firmware/src/fx_model
 ```
 
+
+
 Copy the effect template.
 
 ```
@@ -108,6 +110,19 @@ Edit `firmware/src/fx_model_select.hpp` file.
 
 // Add effect class
 #define SPR_FX_MODEL_SELECT SPR_FX_MODEL_LIST(FxModelDelay, FxModelReverb, FxModelFilter, FxModelYourEffect)
+```
+
+If you want to distribute your custom effect, edit the `firmware/src/config.hpp`
+
+```
+#pragma once
+...
+// firmware vender id (replace your vendor id)
+#define SPR_VENDOR_ID 0xFFFFFFFF
+// firmware id (SMPL = sample firmware)
+#define SPR_FIRMWARE_ID 0x534d504c
+// firmware version ( major (msb) | minor (lsb))
+#define SPR_FIRMWARE_VER (0UL << 16U | 1UL)
 ```
 
 Finally, you can `make` & upload this program.
