@@ -41,6 +41,26 @@ AppSpi spi;
 
 SoftTimer<1> setup_timer; 
 
+// tim2/3/4/5 are used by daisy lib.
+Tim<TimType::tim15> hard_timer; // for button process
+extern "C" void TIM15_IRQHandler() {
+  if (hard_timer.is(TimState::update)) {
+    app_buttons.process();
+    hard_timer.clear(TimState::update);
+  }
+}
+inline void initHardTimer() {
+  hard_timer.init(
+    TimConf {
+      .prescale = 1,
+      .period = 65535,
+      .enable_it_update = true,
+      .interrupt_priority = 2
+    }
+  );
+  hard_timer.start();
+}
+
 void AudioCallback(daisy::AudioHandle::InterleavingInputBuffer  in,
                    daisy::AudioHandle::InterleavingOutputBuffer out,
                    size_t                                size) {
@@ -78,12 +98,14 @@ static inline void setup() {
     app_knob_mode.changeType(KnobModeType::catching);
     app_mode.refresh();
   });
+
+  initHardTimer();
 }
 
 static inline void loop() {
   led_display.process();
   gatein.process();
-  app_buttons.process();
+  //app_buttons.process();
   app_ram.process();
   app_midi.process();
   app_adc.process();

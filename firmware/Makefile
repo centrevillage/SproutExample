@@ -1,5 +1,5 @@
 # Project Name
-TARGET = Sprout
+TARGET = SproutExample
 
 # Sampling Rate
 SAMPLING_RATE = 96000
