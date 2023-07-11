@@ -62,7 +62,11 @@ struct AppAdc {
       float prev_value = getFloatValue(id);
       if (stabilizer.updateCurrentValue(value, context[i], conf)) {
         if (on_change) {
-          on_change(id, getFloatValue(id), prev_value);
+          if (id == AppAnalogId::cvin) {
+            on_change(id, 1.0f - getFloatValue(id), 1.0f - prev_value);
+          } else {
+            on_change(id, getFloatValue(id), prev_value);
+          }
         }
       }
     }
