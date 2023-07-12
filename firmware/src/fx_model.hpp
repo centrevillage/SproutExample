@@ -25,14 +25,14 @@ struct FxModel {
   SPR_FX_MODEL_SELECT
 
   void init(bool reset = true) {
+    std::visit([=](auto& m) {
+      m.init();
+    }, model);
     if (reset) {
       resetValues();
     } else {
       updateAllParams();
     }
-    std::visit([=](auto& m) {
-      m.init();
-    }, model);
   }
 
   void gatein(bool on) {
@@ -79,6 +79,7 @@ struct FxModel {
     std::visit([=](auto& m) {
       m.init();
     }, model);
+    resetValues();
 
     system_memory.writeModelIdx(*this, [](){});
 
