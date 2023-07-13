@@ -18,7 +18,7 @@ using namespace igb::sdk;
 
 IGB_FAST_INLINE LedColor get_fx_model_color() {
   auto c = LedColor::black;
-  switch(fx_model.modelIdx()) {
+  switch(fx_model.nextModelIdx()) {
     case 0:
       c = LedColor::green;
       break;

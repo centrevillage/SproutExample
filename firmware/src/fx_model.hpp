@@ -16,11 +16,14 @@
       default: break; \
     } \
     model_idx = _model_idx; \
+    next_model_idx = model_idx; \
     return true; \
   }
 
 struct FxModel {
   uint8_t model_idx = 0;
+  uint8_t next_model_idx = 0;
+  bool is_dummy_model = false;
 
   SPR_FX_MODEL_SELECT
 
@@ -59,14 +62,20 @@ struct FxModel {
     return model_idx;
   }
 
+  uint8_t nextModelIdx() const {
+    return next_model_idx;
+  }
+
   void nextModel() {
-    changeModel((model_idx + 1) % model_count);
+    next_model_idx = (model_idx + 1) % model_count;
   }
 
   bool changeModel(uint8_t new_model_idx) {
     if (model_idx == new_model_idx) {
       return false;
     }
+
+    is_dummy_model = true;
 
     std::visit([=](auto& m) {
       m.deinit();
@@ -82,6 +91,8 @@ struct FxModel {
     resetValues();
 
     system_memory.writeModelIdx(*this, [](){});
+
+    is_dummy_model = false;
 
     return true;
   }
@@ -109,9 +120,16 @@ struct FxModel {
   }
 
   IGB_FAST_INLINE void process(const float* in_buf, float* out_buf, size_t count) {
+    if (is_dummy_model) {
+      for (size_t x = 0; x < count; ++x) {
+        *(out_buf++) = *(in_buf++);
+      }
+      return;
+    }
     std::visit([=](auto& m) {
       m.process(in_buf, out_buf, count);
     }, model);
+    changeModel(next_model_idx);
   }
 
   IGB_FAST_INLINE void tapTempo(uint16_t tap_tempo_msec) {
