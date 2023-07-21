@@ -74,77 +74,59 @@ struct FxModelDelay {
   void setReadPosBySync(float v) {
     switch ((uint8_t)(v * 17.0f)) {
       case 0: // 1/16 / 8 = 1/128
-        clock_sync.mul = 1;
-        clock_sync.div = 8;
+        clock_sync.setMulDiv(1, 8);
         break;
       case 1: // 1/16 * 3 / 16 = 3/256
-        clock_sync.mul = 3;
-        clock_sync.div = 16;
+        clock_sync.setMulDiv(3, 16);
         break;
       case 2: // 1/16 / 4 = 1/64
-        clock_sync.mul = 1;
-        clock_sync.div = 4;
+        clock_sync.setMulDiv(1, 4);
         break;
       case 3: // 1/16 * 3 / 8 = 3/128
-        clock_sync.mul = 3;
-        clock_sync.div = 8;
+        clock_sync.setMulDiv(3, 8);
         break;
       case 4: // 1/16 / 2 = 1/32
-        clock_sync.mul = 1;
-        clock_sync.div = 2;
+        clock_sync.setMulDiv(1, 2);
         break;
       case 5: // 1/16 * 3 / 4 = 3/64
-        clock_sync.mul = 3;
-        clock_sync.div = 4;
+        clock_sync.setMulDiv(3, 4);
         break;
       case 6: // 1/16 
-        clock_sync.mul = 1;
-        clock_sync.div = 1;
+        clock_sync.setMulDiv(1, 1);
         break;
       case 7: // 1/16 * 3 / 2 = 3/32
-        clock_sync.mul = 3;
-        clock_sync.div = 2;
+        clock_sync.setMulDiv(3, 2);
         break;
       case 8: // 1/16 * 2 =  1/8
-        clock_sync.mul = 2;
-        clock_sync.div = 1;
+        clock_sync.setMulDiv(2, 1);
         break;
       case 9: // 1/16 * 3 = 3/16
-        clock_sync.mul = 3;
-        clock_sync.div = 1;
+        clock_sync.setMulDiv(3, 1);
         break;
       case 10: // 1/16 * 4 = 1/4
-        clock_sync.mul = 4;
-        clock_sync.div = 1;
+        clock_sync.setMulDiv(4, 1);
         break;
       case 11: // 1/16 * 6 = 3/8
-        clock_sync.mul = 6;
-        clock_sync.div = 1;
+        clock_sync.setMulDiv(6, 1);
         break;
       case 12: // 1/16 * 8 = 1/2
-        clock_sync.mul = 8;
-        clock_sync.div = 1;
+        clock_sync.setMulDiv(8, 1);
         break;
       case 13: // 1/16 * 12 = 3/4
-        clock_sync.mul = 12;
-        clock_sync.div = 1;
+        clock_sync.setMulDiv(12, 1);
         break;
       case 14: // 1/16 * 16 = 1
-        clock_sync.mul = 16;
-        clock_sync.div = 1;
+        clock_sync.setMulDiv(16, 1);
         break;
       case 15: // 3/2
-        clock_sync.mul = 24;
-        clock_sync.div = 1;
+        clock_sync.setMulDiv(24, 1);
         break;
       case 16: // 2
-        clock_sync.mul = 32;
-        clock_sync.div = 1;
+        clock_sync.setMulDiv(32, 1);
         break;
       default:
         break;
     }
-    read_pos_normalize = std::clamp(clock_sync.cycleSec() / 10.0f, 0.0f, 1.0f - igb::numbers::epsilon_f);
   }
 
   IGB_FAST_INLINE void updateParam(AppParamId param_id, int16_t param_value) {
@@ -162,8 +144,8 @@ struct FxModelDelay {
         break;
       case AppParamId::time:
         {
+          setReadPosBySync(v);
           if (clock_sync.isActive()) {
-            setReadPosBySync(v);
           } else {
             read_pos_normalize = v * v;
           }
@@ -245,7 +227,7 @@ struct FxModelDelay {
 
   IGB_FAST_INLINE void gatein(bool on) {
     if (on) {
-      if (clock_sync.trigger(current_usec())) {
+      if (clock_sync.trigger(current_tick())) {
         read_pos_normalize = std::clamp(clock_sync.cycleSec() / 10.0f, 0.0f, 1.0f - igb::numbers::epsilon_f);
         updateBeatLfo();
       }

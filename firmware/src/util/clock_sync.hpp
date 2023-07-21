@@ -5,13 +5,18 @@
 #include <algorithm>
 #include <functional>
 
+#include "periph/tim.hpp"
+
 struct ClockSync {
   // 1/8
-  uint32_t mul = 2;
-  uint32_t div = 1;
+  double mul_rate = 2.0 / 1.0;
 
-  uint32_t min_usec = 10UL * 1000UL; // 10 msec
-  uint32_t max_usec = 2000UL * 1000UL; // 2 sec
+  void setMulDiv(uint16_t mul, uint16_t div) {
+    mul_rate = (double)mul / (double)div;
+  }
+
+  uint32_t min_tick = sec_to_tick(0.01); // 10 msec
+  uint32_t max_tick = sec_to_tick(2.0); // 2 sec
 
   enum class ActiveState : uint8_t {
     inactive = 0,
@@ -21,8 +26,8 @@ struct ClockSync {
 
   ActiveState _active = ActiveState::inactive;
   float _cycle_sec = 0.0f;
-  uint32_t _prev_usec = 0;
-  uint32_t _interval_usec = 0;
+  uint32_t _prev_tick = 0;
+  uint32_t _interval_tick = 0;
 
   bool isActive() const { return _active == ActiveState::active; }
 
@@ -31,25 +36,24 @@ struct ClockSync {
   }
 
   // assume to receive the triggers for each 1/16 timing.
-  bool trigger(uint32_t usec) {
+  bool trigger(uint32_t tick) {
     if (_active == ActiveState::inactive) {
-      _prev_usec = usec;
+      _prev_tick = tick;
       _active = ActiveState::ready;
       return false;
     }
 
-    uint32_t diff_usec = usec - _prev_usec;
-    _prev_usec = usec;
-    if (diff_usec < min_usec) {
+    uint32_t diff_tick = tick - _prev_tick;
+    _prev_tick = tick;
+    if (diff_tick < min_tick) {
       return false;
     }
-    if (diff_usec > max_usec) {
-      _active = ActiveState::inactive;
+    if (diff_tick > max_tick) {
       return false;
     }
 
-    _interval_usec = diff_usec;
-    _cycle_sec = (float)(((double)_interval_usec * (double)mul / (double)div) / 1000000.0);
+    _interval_tick = diff_tick;
+    _cycle_sec = (float)(((double)tick_to_sec(_interval_tick) * mul_rate));
 
     _active = ActiveState::active;
 
@@ -60,9 +64,9 @@ struct ClockSync {
     return _cycle_sec;
   }
 
-  void process(uint32_t usec) {
-    uint32_t diff_usec = usec - _prev_usec;
-    if (diff_usec > max_usec) {
+  void process(uint32_t tick) {
+    uint32_t diff_tick = tick - _prev_tick;
+    if (diff_tick > max_tick) {
       _active = ActiveState::inactive;
     }
   }

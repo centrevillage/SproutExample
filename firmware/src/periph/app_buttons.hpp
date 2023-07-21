@@ -8,6 +8,7 @@
 #include <igb_sdk/ui/button_context.hpp>
 #include <igb_util/macro.hpp>
 #include <periph/led_display.hpp>
+#include "periph/tim.hpp"
 
 using namespace igb;
 using namespace igb::stm32;
@@ -65,7 +66,7 @@ struct AppButtons {
   }
 
   IGB_FAST_INLINE void process() {
-    context.process(current_msec());
+    context.process(current_tick());
   }
 
   bool isSproutOn() {

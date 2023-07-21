@@ -22,8 +22,6 @@ enum class AppModeId : uint8_t {
 };
 
 struct AppModeBase {
-  SoftTimer<1> value_disp_timer;
-
   inline void init() {
   }
 
@@ -97,7 +95,6 @@ struct AppModeBase {
   }
 
   IGB_FAST_INLINE void process() {
-    value_disp_timer.process(current_msec());
   }
 
   void dispKnobValue(AppParamId param_id, float value) {

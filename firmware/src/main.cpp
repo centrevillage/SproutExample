@@ -25,6 +25,7 @@
 #include "periph/app_buttons.hpp"
 #include "periph/sdram.hpp"
 #include "periph/system_memory.hpp"
+#include "periph/tim.hpp"
 #include "app_mode.hpp"
 #include "fx_model.hpp"
 #include "periph/memory_manager.hpp"
@@ -75,7 +76,7 @@ static inline void setup() {
   gatein.init();
   app_ram.init();
   memory_manager.init();
-  beat_lfo.init(current_usec());
+  beat_lfo.init(current_tick());
   clock_sync.init();
 
   delay_msec(10);
@@ -94,7 +95,7 @@ static inline void setup() {
   app_ram.busyWait();
   app_mode.init();
 
-  setup_timer.oneshotCallback(10, current_msec(), [](){
+  setup_timer.oneshotCallback(sec_to_tick(0.01), current_tick(), [](){
     app_knob_mode.changeType(KnobModeType::catching);
     app_mode.refresh();
   });
@@ -110,9 +111,9 @@ static inline void loop() {
   app_midi.process();
   app_adc.process();
   app_mode.process();
-  beat_lfo.process(current_usec());
-  setup_timer.process(current_msec());
-  clock_sync.process(current_usec());
+  beat_lfo.process(current_tick());
+  setup_timer.process(current_tick());
+  clock_sync.process(current_tick());
 }
 
 int main(void) {

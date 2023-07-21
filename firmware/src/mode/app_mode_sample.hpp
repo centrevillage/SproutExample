@@ -63,8 +63,8 @@ struct AppModeSample {
     refresh();
 
     level_disp_timer_idx = level_disp_timer.intervalCallback(
-      10,
-      current_msec(),
+      sec_to_tick(0.005),
+      current_tick(),
       []() {
         auto [level_l, level_r] = level_analyzer.getLevels();
         led_display.setLedMeter(LedMeterPos::left, level_l, get_fx_model_color());
@@ -101,12 +101,12 @@ struct AppModeSample {
         if (app_buttons.isAllOff()) {
           uint32_t tap_interval = app_buttons.context.history.findTapInterval(
             AppBtnId::wind,
-            1000, // long press limit (msec)
-            40, // min tap interval (msec)
-            8000 // max tap interval (msec)
+            sec_to_tick(1.0), // long press limit
+            sec_to_tick(0.04), // min tap interval
+            sec_to_tick(8.0) // max tap interval
           );
           if (tap_interval > 0) {
-            fx_model.tapTempo(tap_interval);
+            fx_model.tapTempo(tick_to_sec(tap_interval) * 1000.0);
           }
         }
         needs_refresh = true;
@@ -136,7 +136,7 @@ struct AppModeSample {
 
   IGB_FAST_INLINE void process() {
     base.process();
-    level_disp_timer.process(current_msec());
+    level_disp_timer.process(current_tick());
   }
   // }}}
 

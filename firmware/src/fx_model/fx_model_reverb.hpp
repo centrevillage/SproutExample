@@ -34,7 +34,7 @@ struct FxModelReverb {
   igb::dsp::DelayLine main_line[reverb_order];
   MemoryArea main_area[reverb_order];
 
-  constexpr static double delay_min = 0.1;
+  constexpr static double delay_min = 0.02;
   constexpr static double delay_max = 1.0;
   double delay = 0.5f;
   double delay_smooth = 0.5;

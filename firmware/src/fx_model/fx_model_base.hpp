@@ -13,6 +13,7 @@
 #include "app_param_id.hpp"
 #include "app_params.hpp"
 #include "periph/sdram.hpp"
+#include "periph/tim.hpp"
 #include <igb_util/dsp/digi_tape.hpp>
 #include <igb_util/dsp/delay_line.hpp>
 #include <igb_util/dsp/biquad_filter.hpp>
