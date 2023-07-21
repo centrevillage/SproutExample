@@ -53,6 +53,7 @@ struct FxModelDelay {
     }
     updateBeatLfo();
     initSync();
+    read_pos_real = read_pos_normalize * buffer_size_d;
   }
 
   IGB_FAST_INLINE void deinit() {
