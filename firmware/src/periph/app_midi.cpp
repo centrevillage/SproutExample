@@ -2,8 +2,6 @@
 
 AppMidi app_midi;
 
-bool led_flag = false;
-
 uint8_t send_event_bytes[3] = {0, 0, 0};
 
 void AppMidi::onReceive(daisy::MidiEvent m) {
